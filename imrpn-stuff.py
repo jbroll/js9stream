@@ -50,7 +50,7 @@ def gauss2d_shim(b, a, par):
     return gauss2d(b, a, *par)
 
 def init():
-	rpndef("gauss", makeGaussian, [num, num, num])
-	rpndef("gauss2d", gauss2d_shim, [num, num, any])
-	rpndef("poisson", numpy.random.poisson, [num])
+	rpndef("gauss", makeGaussian, [Num, Num, Num])
+	rpndef("gauss2d", gauss2d_shim, [Num, Num, Any])
+	rpndef("poisson", numpy.random.poisson, [Num])
 
