@@ -1,0 +1,32 @@
+
+SEC=30
+FPS=24
+
+width=10
+sigma=5
+
+x=250
+y=261
+wiggle=15
+
+
+N=`calc $FPS*$SEC`
+
+
+jottable $N N | compute ".x=$x+ rand()*$wiggle;
+			 .y=$y+ rand()*$wiggle;
+			 .w=$width+ rand()*$sigma;
+			 .h=$width+ rand()*$sigma;
+			 .t+=((t+ rand()*30)-15) % 360" |
+(
+	read HEADER
+	read DASHES
+
+    while read $HEADER ; do
+	#imrpn 50 25 [ [ 512  512 ] [ $x $y ] [ $w $h ] $t ] gauss2d poisson -16 array ds9: # > images/im.$N.fits
+	imrpn 50 25 [ [ 512  512 ] [ $x $y ] [ $w $h ] $t ] gauss2d poisson -16 array > images/im.$N.fits
+    done
+)
+
+exit
+
