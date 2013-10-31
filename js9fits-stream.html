@@ -23,7 +23,7 @@
       <script type="text/javascript" src="js9.js"></script>
 
         <script>
-            var socket = new WebSocket('ws://localhost:3000', ["fits-stream"]);
+            var socket = new WebSocket('ws://' + window.location.host + ':3000', ["fits-stream"]);
 
 	    socket.onopen = function(ev) {
 		socket.send("getimage");
@@ -56,9 +56,9 @@
 		}
 
 
-		if ( start != new Date().getSeconds() ) {
+		if ( start+10 <= new Date().getSeconds() ) {
 	    	    start = new Date().getSeconds()
-		    fps = count
+		    fps = count/10.0
 		    count = 0
 		} else {
 		    count += 1;
@@ -72,10 +72,11 @@
         </script>
     </head>
     <body>
-        <ul id='messages'></ul>
-
     <div class="JS9Menubar"></div>
     <div class="JS9"></div>
+
+        <ul id='messages'></ul>
+
 	
     </body>
 </html>
