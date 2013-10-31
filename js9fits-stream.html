@@ -1,0 +1,81 @@
+<html>
+    <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" > 
+      <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico">
+      <link type="text/css" rel="stylesheet" href="css/jquery.contextMenu.css">
+      <link rel="stylesheet" href="css/dhtmlwindow.css" type="text/css">
+      <link type="text/css" rel="stylesheet" href="js9.css">
+      <script type="text/javascript" src="js/jquery.min.js"></script>
+      <script type="text/javascript" src="js/kinetic.min.js"></script>
+      <script type="text/javascript" src="js/jquery.contextMenu.min.js"></script>
+      <script type="text/javascript" src="js/jquery.flot.min.js"></script>
+      <script type="text/javascript" src="js/jquery.flot.errorbars.min.js"></script>
+      <script type="text/javascript" src="js/sprintf.min.js"></script>
+      <script type="text/javascript" src="js/dhtmlwindow.min.js">
+      /***********************************************
+      * DHTML Window Widget- © Dynamic Drive (www.dynamicdrive.com)
+      * This notice must stay intact for legal use.
+      * Visit http://www.dynamicdrive.com/ for full source code
+      ***********************************************/
+      </script>
+      <script type="text/javascript" src="js/fitsy.js"></script>
+      <script type="text/javascript" src="js9.js"></script>
+
+        <script>
+            var socket = new WebSocket('ws://localhost:3000', ["fits-stream"]);
+
+	    socket.onopen = function(ev) {
+		socket.send("getimage");
+	    }
+
+	    var count = 0
+	    var start = new Date().getSeconds()
+	    var fps = 0
+
+	    socket.onmessage = function(ev) {
+
+		var im;
+
+		if ( count == 0 ) {
+		     Fitsy.fitsopen(ev.data, function(fits) {
+			fits.name = "live-data";
+
+			Fitsy.dataread(fits, fits.hdu[0], function(hdu) {
+			    im = JS9.Load(hdu)
+			})
+		     })
+		} else {
+		     Fitsy.fitsopen(ev.data, function(fits) {
+			fits.name = "live-data";
+
+			Fitsy.dataread(fits, fits.hdu[0], function(hdu) {
+			    JS9.Refresh("live-data", hdu)
+			})
+		     })
+		}
+
+
+		if ( start != new Date().getSeconds() ) {
+	    	    start = new Date().getSeconds()
+		    fps = count
+		    count = 0
+		} else {
+		    count += 1;
+		}
+
+		
+		$("#messages").html("<ul>" + fps.toString() + "</ul>");
+		socket.send("getimage");
+	    }
+
+        </script>
+    </head>
+    <body>
+        <ul id='messages'></ul>
+
+    <div class="JS9Menubar"></div>
+    <div class="JS9"></div>
+	
+    </body>
+</html>
