@@ -18,25 +18,25 @@ ws.on('request', function(request) {
 
     var sock = request.accept('fits-stream', request.origin)
 
-    console.log('Conneciton Accepted')
+    //console.log('Conneciton Accepted')
 
     var count = 0
 
     sock.on('message', function(message) {
 	//console.log('Message : ', message)
 
-	count %= 720;
+	count %= 120;
 	count += 1;
 
 	if ( message.type == "utf8" && message.utf8Data == "getimage" ) {
 	    var image = "images/im." + count + ".fits"
 
-	    //console.log(image)
+	    console.log(image)
 
 	    fs.open(image, 'r',
 		function(status, fd) {
 		    if ( status ) { 
-			console.log("status", status)
+			//console.log("status", status)
 			return;
 		    }
 
