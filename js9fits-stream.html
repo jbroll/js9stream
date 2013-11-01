@@ -33,51 +33,57 @@
 
 
 	    var count = 0
-	    var start = new Date().getSeconds()
+	    var start = new Date().getTime()
 	    var fps = 0
 
-	    var size = 512;
+	    var size = 256;
 	    var im = []
+
+	    var run = 0;
 
 
 
             var socket = new WebSocket('ws://' + host + ':3000', ["fits-stream"]);
 
-	    socket.onopen = function(ev) {
-		socket.send("getimage " + size.toString());
+	    function setrun(x) {
+		run = x
+
+		if ( run ) {
+		    socket.send("getimage " + size.toString());
+		}
 	    }
 
 	    socket.onmessage = function(ev) {
 
 		if ( im[size] == undefined ) {
 		     Fitsy.fitsopen(ev.data, function(fits) {
-			fits.name = "live-data-" + fits.head.NAXIS1;
+			fits.name = "live-data-" + fits.hdu[0].axis[1].toString();
 
 			console.log("open")
 
 			Fitsy.dataread(fits, fits.hdu[0], function(hdu) {
 			    im[size] = 1
 			    JS9.Load(hdu)
-			    socket.send("getimage " + fits.head.NAXIS1);
+			    if ( run ) { socket.send("getimage " + size.toString()); }
 			})
 		     })
 		} else {
 		     Fitsy.fitsopen(ev.data, function(fits) {
 
 			Fitsy.dataread(fits, fits.hdu[0], function(hdu) {
-			    fits.name = "live-data-" + fits.head.NAXIS1;
+			    fits.name = "live-data-" + fits.hdu[0].axis[1].toString();
 
 			    setTimeout(function() {
 				JS9.Refresh(fits.name, hdu)
-				socket.send("getimage " + fits.head.NAXIS1);
+				if ( run ) { socket.send("getimage " + size.toString()); }
 			    }, 1)
 			})
 		     })
 		}
 
 
-		if ( (start+10) <= new Date().getSeconds() ) {
-	    	    start = new Date().getSeconds()
+		if ( (start+10000) <= new Date().getTime() ) {
+	    	    start = new Date().getTime()
 		    fps   = count/10.0
 		    console.log(fps)
 		    count = 0
@@ -104,8 +110,8 @@
         <br>
 
 	<form>
-	<input type=button value=Start>
-	<input type=button value=Stop>
+	<input type=button value=Start onclick="setrun(true)">
+	<input type=button value=Stop  onclick="setrun(false)">
 	Image Size:
 	<input type=button value=512 onclick="imagesize(512)">
 	<input type=button value=256 onclick="imagesize(256)">
