@@ -31,7 +31,7 @@ ws.on('request', function(request) {
 	if ( message.type == "utf8" && message.utf8Data == "getimage" ) {
 	    var image = "images/im." + count + ".fits"
 
-	    console.log(image)
+	    //console.log(image)
 
 	    fs.open(image, 'r',
 		function(status, fd) {

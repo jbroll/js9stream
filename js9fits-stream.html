@@ -23,7 +23,15 @@
       <script type="text/javascript" src="js9.js"></script>
 
         <script>
-            var socket = new WebSocket('ws://' + window.location.host + ':3000', ["fits-stream"]);
+	    var host = window.location.host;
+
+	    console.log(host)
+
+	    if ( host === "" ) {
+		host = "localhost"
+	    }
+		
+            var socket = new WebSocket('ws://' + host + ':3000', ["fits-stream"]);
 
 	    socket.onopen = function(ev) {
 		socket.send("getimage");
@@ -50,17 +58,19 @@
 			fits.name = "live-data";
 
 			Fitsy.dataread(fits, fits.hdu[0], function(hdu) {
-			    JS9.Refresh("live-data", hdu)
+			    setTimeout(function() { JS9.Refresh("live-data", hdu) }, 10)
 			})
 		     })
 		}
 
 
-		if ( start+10 <= new Date().getSeconds() ) {
+		if ( (start+10) <= new Date().getSeconds() ) {
 	    	    start = new Date().getSeconds()
-		    fps = count/10.0
+		    fps   = count/10.0
+		    console.log(fps)
 		    count = 0
 		} else {
+		    console.log(count)
 		    count += 1;
 		}
 
