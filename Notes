@@ -5,6 +5,9 @@ FPS=24
 width=10
 sigma=5
 
+nx=512
+ny=512
+
 x=250
 y=261
 wiggle=15
@@ -23,9 +26,30 @@ jottable $N N | compute ".x=$x+ rand()*$wiggle;
 	read DASHES
 
     while read $HEADER ; do
-	#imrpn 50 25 [ [ 512  512 ] [ $x $y ] [ $w $h ] $t ] gauss2d poisson -16 array ds9: # > images/im.$N.fits
-	imrpn 50 25 [ [ 512  512 ] [ $x $y ] [ $w $h ] $t ] gauss2d poisson -16 array > images/im.$N.fits
+        nxx=$nx
+	nyy=$ny
+	xx=$x
+	yy=$y
+
+	imrpn 50 25 [ [ $nxx  $nyy ] [ $xx $yy ] [ $w $h ] $t ] gauss2d poisson -16 array > images/im.$N.${nxx}x${nyy}.fits
+
+	nxx=`calc $nxx/2`
+	nyy=`calc $nyy/2`
+
+	xx=`calc $xx/2`
+	yy=`calc $yy/2`
+
+	imrpn 50 25 [ [ $nxx  $nyy ] [ $xx $yy ] [ $w $h ] $t ] gauss2d poisson -16 array > images/im.$N.${nxx}x${nyy}.fits
+
+	nxx=`calc $nxx/2`
+	nyy=`calc $nyy/2`
+
+	xx=`calc $xx/2`
+	yy=`calc $yy/2`
+
+	imrpn 50 25 [ [ $nxx  $nyy ] [ $xx $yy ] [ $w $h ] $t ] gauss2d poisson -16 array > images/im.$N.${nxx}x${nyy}.fits
     done
+
 )
 
 exit
