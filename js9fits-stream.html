@@ -51,25 +51,25 @@
 
 		if ( im[size] == undefined ) {
 		     Fitsy.fitsopen(ev.data, function(fits) {
-			fits.name = "live-data-" + size.toString();
+			fits.name = "live-data-" + fits.head.NAXIS1;
 
 			console.log("open")
 
 			Fitsy.dataread(fits, fits.hdu[0], function(hdu) {
 			    im[size] = 1
 			    JS9.Load(hdu)
-			    socket.send("getimage " + size.toString());
+			    socket.send("getimage " + fits.head.NAXIS1);
 			})
 		     })
 		} else {
 		     Fitsy.fitsopen(ev.data, function(fits) {
 
 			Fitsy.dataread(fits, fits.hdu[0], function(hdu) {
-			    fits.name = "live-data-" + size.toString();
+			    fits.name = "live-data-" + fits.head.NAXIS1;
 
 			    setTimeout(function() {
 				JS9.Refresh(fits.name, hdu)
-				socket.send("getimage " + size.toString());
+				socket.send("getimage " + fits.head.NAXIS1);
 			    }, 1)
 			})
 		     })
