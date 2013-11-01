@@ -28,29 +28,42 @@ ws.on('request', function(request) {
 	count %= 120;
 	count += 1;
 
-	if ( message.type == "utf8" && message.utf8Data == "getimage" ) {
-	    var image = "images/im." + count + ".fits"
+	if ( message.type == "utf8" ) {
+	    cmd = message.utf8Data.split(" ")
+	    
 
-	    //console.log(image)
+	    if ( cmd[0] == "getimage" ) {
 
-	    fs.open(image, 'r',
-		function(status, fd) {
-		    if ( status ) { 
-			//console.log("status", status)
-			return;
-		    }
-
-		    stat = fs.fstatSync(fd)
-
-		    buffer = new Buffer(stat.size)
-
-		    fs.read(fd, buffer, 0, stat.size, 0, function() {
-			fs.close(fd)
-			sock.send(buffer)
-		    })
-
+	        switch ( cmd[1] ) {
+		  case '512' : xxx = '512'; break;
+		  case '256' : xxx = '256'; break;
+		  case '128' : xxx = '128'; break;
+		  default:     xxx = '256'; break;
 		}
-	    )
+
+		var image = "images/im." + count + "." + xxx + "x" + xxx + ".fits"
+
+		//console.log(image)
+
+		fs.open(image, 'r',
+		    function(status, fd) {
+			if ( status ) { 
+			    //console.log("status", status)
+			    return;
+			}
+
+			stat = fs.fstatSync(fd)
+
+			buffer = new Buffer(stat.size)
+
+			fs.read(fd, buffer, 0, stat.size, 0, function() {
+			    fs.close(fd)
+			    sock.send(buffer)
+			})
+
+		    }
+		)
+	    }
 	}
     })
 })
