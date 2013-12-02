@@ -31,6 +31,8 @@ jottable $N N | compute ".x=$x+ rand()*$wiggle;
 	xx=$x
 	yy=$y
 
+	# 512x512
+	#
 	imrpn 50 25 [ [ $nxx  $nyy ] [ $xx $yy ] [ $w $h ] $t ] gauss2d poisson -16 array > images/im.$N.${nxx}x${nyy}.fits
 
 	nxx=`calc $nxx/2`
@@ -39,6 +41,8 @@ jottable $N N | compute ".x=$x+ rand()*$wiggle;
 	xx=`calc $xx/2`
 	yy=`calc $yy/2`
 
+	# 256x256
+	#
 	imrpn 50 25 [ [ $nxx  $nyy ] [ $xx $yy ] [ $w $h ] $t ] gauss2d poisson -16 array > images/im.$N.${nxx}x${nyy}.fits
 
 	nxx=`calc $nxx/2`
@@ -47,6 +51,8 @@ jottable $N N | compute ".x=$x+ rand()*$wiggle;
 	xx=`calc $xx/2`
 	yy=`calc $yy/2`
 
+	# 128x128
+	#
 	imrpn 50 25 [ [ $nxx  $nyy ] [ $xx $yy ] [ $w $h ] $t ] gauss2d poisson -16 array > images/im.$N.${nxx}x${nyy}.fits
     done
 
