@@ -1,0 +1,125 @@
+<html>
+    <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" > 
+      <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico">
+      <link type="text/css" rel="stylesheet" href="css/jquery.contextMenu.css">
+      <link rel="stylesheet" href="css/dhtmlwindow.css" type="text/css">
+      <link type="text/css" rel="stylesheet" href="js9.css">
+      <script type="text/javascript" src="js/jquery.min.js"></script>
+      <script type="text/javascript" src="js/kinetic.min.js"></script>
+      <script type="text/javascript" src="js/jquery.contextMenu.min.js"></script>
+      <script type="text/javascript" src="js/jquery.flot.min.js"></script>
+      <script type="text/javascript" src="js/jquery.flot.errorbars.min.js"></script>
+      <script type="text/javascript" src="js/sprintf.min.js"></script>
+      <script type="text/javascript" src="js/dhtmlwindow.min.js">
+      /***********************************************
+      * DHTML Window Widget- © Dynamic Drive (www.dynamicdrive.com)
+      * This notice must stay intact for legal use.
+      * Visit http://www.dynamicdrive.com/ for full source code
+      ***********************************************/
+      </script>
+      <script type="text/javascript" src="js/fitsy.js"></script>
+      <script type="text/javascript" src="js/astrolib.js"></script>
+      <script type="text/javascript" src="js9.js"></script>
+
+        <script>
+	    var socket;
+	    var fps;
+	    var count = 0
+	    var start = new Date().getTime()
+
+	    var size = 256;
+	    var im = []
+
+	    var run = 0;
+
+	    function wsconnect() {
+		var host = window.location.host;
+
+		if ( host === "" ) {
+		    host = "localhost"
+		}
+
+		console.log(host)
+
+		return new WebSocket('ws://' + host + ':3000', ["fits-stream"]);
+	    }
+
+	   socket = wsconnect();
+
+
+	    function setrun(x) {
+		run = x
+
+		if ( run ) {
+		    socket.send("getimage " + size.toString());
+		}
+	    }
+
+	    socket.onmessage = function(ev) {
+
+		if ( im[size] == undefined ) {
+		     Fitsy.fitsopen(ev.data, function(fits) {
+			fits.name = "live-data-" + fits.hdu[0].axis[1].toString();
+
+			console.log("open")
+
+			Fitsy.dataread(fits, fits.hdu[0], function(hdu) {
+			    im[size] = 1
+			    JS9.Load(hdu)
+			    if ( run ) { socket.send("getimage " + size.toString()); }
+			})
+		     })
+		} else {
+		     Fitsy.fitsopen(ev.data, function(fits) {
+
+			Fitsy.dataread(fits, fits.hdu[0], function(hdu) {
+			    fits.name = "live-data-" + fits.hdu[0].axis[1].toString();
+
+			    setTimeout(function() {
+				JS9.Refresh(fits.name, hdu)
+				if ( run ) { socket.send("getimage " + size.toString()); }
+			    }, 1)
+			})
+		     })
+		}
+
+
+		if ( (start+10000) <= new Date().getTime() ) {
+	    	    start = new Date().getTime()
+		    fps   = count/10.0
+		    console.log(fps)
+		    count = 0
+		} else {
+		    count += 1;
+		}
+		
+		$("#messages").html(fps.toString());
+	    }
+
+	    function imagesize(x) {
+		size = x
+	    }
+
+        </script>
+    </head>
+    <body>
+    <div class="JS9Menubar"></div>
+    <div class="JS9"></div>
+
+        <br>
+        FPS <span id='messages'></span>
+        <br>
+        <br>
+
+	<form>
+	<input type=button value=Start onclick="setrun(true)">
+	<input type=button value=Stop  onclick="setrun(false)">
+	Image Size:
+	<input type=button value=512 onclick="imagesize(512)">
+	<input type=button value=256 onclick="imagesize(256)">
+	<input type=button value=128 onclick="imagesize(128)">
+	</form>
+    </body>
+</html>
