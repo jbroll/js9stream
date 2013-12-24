@@ -1,4 +1,4 @@
-
+#!/usr/bin/env node
 
 var server = require('http').Server();
 var websok = require('websocket').server;
